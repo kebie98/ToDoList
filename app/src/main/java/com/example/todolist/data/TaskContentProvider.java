@@ -11,6 +11,7 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
+//Verify the TaskContentProvider extends from the ContentProvider and implements required methods
 public class TaskContentProvider extends ContentProvider {
 
     public static final int TASKS = 100;
@@ -28,6 +29,7 @@ public class TaskContentProvider extends ContentProvider {
         return uriMatcher;
     }
 
+    //Member variable for a TaskDbHelper that's initialized in the onCreate() method
     private TaskDbHelper mTaskDbHelper;
 
     @Override
@@ -39,6 +41,7 @@ public class TaskContentProvider extends ContentProvider {
         return true;
     }
 
+    //Implement insert to handle requests to a insert a single new row of data
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
 
@@ -61,10 +64,12 @@ public class TaskContentProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("unknown uri: " + uri);
         }
+        //Notify the resolver if the uri has been changed, and return the newly inserted URI
         getContext().getContentResolver().notifyChange(uri, null);
         return returnUri;
     }
 
+    //Implement query to handle requests for data by URI
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder){
@@ -89,11 +94,14 @@ public class TaskContentProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unkown uri: " + uri);
         }
 
+        //Set a notification URI on the Cursor and return that Cursor
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
 
+        //Return the desired Cursor
         return retCursor;
     }
 
+    //Implement delete to delete a single row of data
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
 
@@ -110,8 +118,10 @@ public class TaskContentProvider extends ContentProvider {
                 tasksDeleted = db.delete(TaskContract.TaskEntry.TABLE_NAME, "_id=? ", new String[]{id});
                 break;
             default:
+                //If a task was deleted, set notification
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+        //return the number of tasks deleted
         return tasksDeleted;
     }
 
